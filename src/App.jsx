@@ -6,13 +6,20 @@ import VerifyOtp from './pages/Auth/VerifyOtp';
 import './App.css'
 import DashBoard from './pages/Dashboard/main';
 import { useSelector } from 'react-redux';
+import useGetUser from './utils/getuser';
+import Feed from './pages/Dashboard/feed';
+import SearchTablet from './pages/Dashboard/searchTab';
 
 
 
 function App() {
  
+    useGetUser()
+    //console.log("data" , data);
    const user = useSelector((store)=>store?.user)
-   console.log("App" ,  user);
+  // console.log("App" ,  user);
+
+   
 
   return (
   
@@ -26,7 +33,12 @@ function App() {
        <Route path='/signup' element={user? <Navigate to={'/'} /> :   <Signup/> }     />
        <Route path='/login' element={user? <Navigate to={'/'} /> : <Login/>} />
        <Route path='/verify-otp' element={user? <Navigate to={'/'} /> : <VerifyOtp/>} />
-       <Route path='/' element={<DashBoard/>}/>
+      
+       <Route path='/' element={user?<DashBoard/>: <Navigate to={'/login'} />}>
+       <Route index element={<Navigate to="feed" />} />
+       <Route path="feed" element={<Feed />} />
+       <Route path='search' element={<SearchTablet/>}/>
+       </Route>
        </Routes>
 
 

@@ -23,8 +23,9 @@ try {
   
   const res = await axios.post(`${Backend_URL}/login` , {Email:email , Password:password} ,{withCredentials:true})
    //console.log(res?.data);
-   toast.success(`Welcome back! Signed in as ${res?.data?.message?.FullName}`);
-   dispatch(addUsers(res?.data?.message))
+  dispatch(addUsers(res?.data?.user))
+   toast.success(`Welcome back! Signed in as ${res?.data?.user?.FullName}`);
+  
    navigate('/')
 } catch (error) {
     console.error(error);

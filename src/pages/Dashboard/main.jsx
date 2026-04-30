@@ -1,6 +1,12 @@
+import { Header } from "@/components/dashboardui/header"
+import { Outlet } from "react-router-dom"
+
 const DashBoard = ()=>{
     return(
-        <h1>Welcome To Dashboard</h1>
+       <>
+        <Header/>
+        <Outlet/>
+       </>
     )
 }
 
