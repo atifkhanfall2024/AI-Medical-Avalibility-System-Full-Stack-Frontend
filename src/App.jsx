@@ -9,12 +9,15 @@ import { useSelector } from 'react-redux';
 import useGetUser from './utils/getuser';
 import Feed from './pages/Dashboard/feed';
 import SearchTablet from './pages/Dashboard/searchTab';
+import Admin from './pages/Admin/admin';
+import MyComponent from './customhooks/getPharmacies';
 
 
 
 function App() {
  
     useGetUser()
+    MyComponent()
     //console.log("data" , data);
    const user = useSelector((store)=>store?.user)
   // console.log("App" ,  user);
@@ -38,6 +41,7 @@ function App() {
        <Route index element={<Navigate to="feed" />} />
        <Route path="feed" element={<Feed />} />
        <Route path='search' element={<SearchTablet/>}/>
+       <Route  path='admin' element={<Admin/>} />
        </Route>
        </Routes>
 

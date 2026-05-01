@@ -11,6 +11,10 @@ import {
   ShieldCheck,
   Eye,
   EyeOff,
+  MapPin,
+  Crosshair,
+  Loader2,
+  Sparkles
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Backend_URL from "@/utils/constant";
+
 
 const roles = [
   { value: "User", label: "User", description: "Patient access", icon: Stethoscope },
@@ -33,8 +38,39 @@ const Index = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");
   const [showPassword, setShowPassword] = useState(false);
-
+  const [loading, setLoading] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [location, setLocation] = useState("");
+  const [coords, setCoords] = useState(null);
   const navigate = useNavigate()
+
+
+  const handleUseMyLocation = () => {
+  if (!navigator.geolocation) {
+    toast.error("Geolocation not supported");
+    return;
+  }
+
+  setLocating(true);
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+
+      setCoords([lng, lat]);
+      setLocation(`${lat.toFixed(4)}, ${lng.toFixed(4)}`); 
+
+      setLocating(false);
+      toast.success("Location detected");
+    },
+    () => {
+      setLocating(false);
+      toast.error("Unable to fetch location");
+    }
+  );
+};
+
 
   const handleSubmit = async(e) => {
     e.preventDefault();
@@ -44,7 +80,8 @@ const Index = () => {
       Password:password ,
       FullName:name ,
       Role:role , 
-      PhoneNumber:phone
+      PhoneNumber:phone,
+      location:coords
     } , {withCredentials:true})
 
     console.log(response.data);
@@ -158,7 +195,38 @@ const Index = () => {
                 />
               </div>
             </div>
+       {/* Location */}
+ <div className="space-y-2">
+                  <Label className="text-base font-semibold flex items-center gap-2">
+                    <MapPin className="size-4 text-primary" /> Your location
+                  </Label>
 
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
+                      <Input
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
+                        placeholder="City, area or pincode"
+                        className="pl-9 h-12"
+                      />
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleUseMyLocation}
+                      disabled={locating}
+                      className="h-12"
+                    >
+                      {locating ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Crosshair className="size-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
             {/* Roles */}
             <div className="space-y-2">
               <Label className="text-gray-700">Role</Label>

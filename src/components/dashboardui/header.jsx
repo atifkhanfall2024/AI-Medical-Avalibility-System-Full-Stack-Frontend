@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import axios from "axios";
 import Backend_URL from "@/utils/constant";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { removeUsers } from "@/Redux/userslice";
 
 export const Header = ({ name, avatarUrl }) => {
@@ -14,6 +14,17 @@ export const Header = ({ name, avatarUrl }) => {
   const dispatch = useDispatch();
 
   const safeName = name || "User";
+ const user = useSelector((store)=>store.user)
+ console.log(user);
+  const navItems = [
+  { name: "Dashboard", path: "/feed" },
+  { name: "Search Tablet", path: "/search" },
+  { name: "Appointments", path: "/appointments" },
+  { name:user?.Role === "Admin" && user?.status === "Approved"?"Admin" : "Reports", path:
+    user?.Role === "Admin" && user?.status === "Approved"
+      ? "/admin"
+      : "/report",},
+];
 
   const initials = safeName
     .split(" ")
@@ -57,19 +68,17 @@ export const Header = ({ name, avatarUrl }) => {
         </div>
 
         {/* CENTER: NAV */}
-        <nav className="hidden md:flex items-center gap-2 mx-auto">
-          {["Dashboard", "Patients", "Appointments", "Reports"].map(
-            (item) => (
-              <Link
-                key={item}
-                to="/feed"
-                className="px-3 py-2 text-sm font-medium text-gray-500 hover:text-black rounded-md hover:bg-gray-100 transition"
-              >
-                {item}
-              </Link>
-            )
-          )}
-        </nav>
+      <nav className="hidden md:flex items-center gap-2 mx-auto">
+  {navItems.map((item) => (
+    <Link
+      key={item.name}
+      to={item.path}
+      className="px-3 py-2 text-sm font-medium text-gray-500 hover:text-black rounded-md hover:bg-gray-100 transition"
+    >
+      {item.name}
+    </Link>
+  ))}
+</nav>
 
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-3">
