@@ -19,7 +19,10 @@ export const Header = ({ name, avatarUrl }) => {
   const navItems = [
   { name: "Dashboard", path: "/feed" },
   { name: "Search Tablet", path: "/search" },
-  { name: "Appointments", path: "/appointments" },
+  { name:user?.Role === "Pharmacy" && user?.status === "Approved"?"PharmacyForm" : "Near Pharmacies", path:
+    user?.Role === "Pharmacy" && user?.status === "Approved"
+      ? "/pharmacy/form"
+      : "avalible/pharmacy" },
   { name:user?.Role === "Admin" && user?.status === "Approved"?"Admin" : "Reports", path:
     user?.Role === "Admin" && user?.status === "Approved"
       ? "/admin"

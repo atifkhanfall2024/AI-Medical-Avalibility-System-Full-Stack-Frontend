@@ -12,6 +12,8 @@ import SearchTablet from './pages/Dashboard/searchTab';
 import Admin from './pages/Admin/admin';
 import MyComponent from './customhooks/getPharmacies';
 import GetAdmins from './customhooks/getAdmins';
+import Pharmacy from './pages/pharmacy/pharmacy';
+import AvailablePharmacies from './pages/pharmacy/avalible';
 
 
 
@@ -43,6 +45,8 @@ function App() {
        <Route path="feed" element={<Feed />} />
        <Route path='search' element={<SearchTablet/>}/>
        <Route  path='admin' element={<Admin/>} />
+       <Route path='pharmacy/form' element={<Pharmacy/>} />
+       <Route path='avalible/pharmacy' element={<AvailablePharmacies/>}/>
        </Route>
        </Routes>
 
