@@ -11,18 +11,19 @@ import Feed from './pages/Dashboard/feed';
 import SearchTablet from './pages/Dashboard/searchTab';
 import Admin from './pages/Admin/admin';
 import MyComponent from './customhooks/getPharmacies';
+import GetAdmins from './customhooks/getAdmins';
 
 
 
 function App() {
  
     useGetUser()
-    MyComponent()
+   
     //console.log("data" , data);
    const user = useSelector((store)=>store?.user)
   // console.log("App" ,  user);
-
-   
+   MyComponent(user)
+   GetAdmins(user)
 
   return (
   

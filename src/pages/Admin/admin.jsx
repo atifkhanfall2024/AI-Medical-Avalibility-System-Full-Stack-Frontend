@@ -25,6 +25,10 @@ import {
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import getAddress from "@/utils/geocoding";
+import MyComponent from "@/customhooks/getPharmacies";
+import GetAdmins from "@/customhooks/getAdmins";
+import axios from "axios";
+import Backend_URL from "@/utils/constant";
 
 const pharmaciesData = [
   {
@@ -97,6 +101,13 @@ const LicensePreview = ({ src }) => (
 export default function Admin() {
   const [query, setQuery] = useState("");
 const [addresses, setAddresses] = useState({});
+const [Values , setValues] = useState("")
+const [uid , setuid] = useState()
+const user = useSelector((store)=>store.user)
+const admins = useSelector((store)=>store.admin)
+
+MyComponent(user)
+GetAdmins(user)
 const pharma = useSelector((store)=>store?.pharmacy)||[]
 console.log('pharmacy ' , pharma);
 useEffect(() => {
@@ -138,7 +149,32 @@ useEffect(() => {
 }, [pharma]);
 
 //console.log('pharmacy' , pharma);
+ 
+  const HandleApprove  = async(id)=>{
+  
 
+   try {
+     const res =await axios.post(`${Backend_URL}/change/status` , {userId:id , status:"Approved"} ,{withCredentials:true})
+    toast.success(res?.data?.message || "Status Change Success")
+   } catch (error) {
+    console.log(error?.message || error);
+    toast.error("Status not Change some Error")
+   }
+
+  }
+
+  const HandleReject = async(id)=>{
+  
+      try {
+     const res = await axios.post(`${Backend_URL}/change/status` , {userId:id , status:"Rejected"} ,{withCredentials:true})
+    toast.success(res?.data?.message || "Status Change Success")
+   } catch (error) {
+    console.log(error?.message || error);
+    toast.error("Status not Change some Error")
+   }
+  }
+
+  
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -236,18 +272,18 @@ useEffect(() => {
         </TableCell>
 
         <TableCell>
-          <LicensePreview src={"img"} />
+          <LicensePreview src={p.Photo} />
         </TableCell>
 
         <TableCell>
-          <Badge>Pending</Badge>
+          <Badge>{p.status}</Badge>
         </TableCell>
 
         <TableCell className="flex gap-2">
-          <Button size="sm" className="bg-teal-500">
+          <Button size="sm" className="bg-teal-500" onClick={()=> HandleApprove(p._id)}>
             Approve
           </Button>
-          <Button size="sm" variant="outline">
+          <Button size="sm" variant="outline" onClick={()=>HandleReject(p._id)}>
             <XCircle className="w-4 h-4 text-red-500" />
           </Button>
         </TableCell>
@@ -280,30 +316,37 @@ useEffect(() => {
                 </TableHeader>
 
                 <TableBody>
-                  {adminsData.map((a) => (
+                  {admins.length>0 ? ( admins.map((a) => (
                     <TableRow key={a.id}>
                       <TableCell>
-                        <p className="font-medium">{a.name}</p>
-                        <p className="text-xs text-gray-500">{a.id}</p>
+                        <p className="font-medium">{a.FullName}</p>
+                        <p className="text-xs text-gray-500">{a._id}</p>
                       </TableCell>
 
-                      <TableCell>{a.email}</TableCell>
-                      <TableCell>{a.role}</TableCell>
+                      <TableCell>{a.Email}</TableCell>
+                      <TableCell>{a.Role}</TableCell>
 
                       <TableCell>
-                        <Badge>Pending</Badge>
+                        <Badge>{a.status}</Badge>
                       </TableCell>
 
                       <TableCell className="flex gap-2">
-                        <Button size="sm" className="bg-teal-500">
+                        <Button size="sm" className="bg-teal-500"  onClick={()=>HandleApprove(a._id)}>
                           Approve
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" onClick={()=>HandleReject(a._id)}>
                           <XCircle className="w-4 h-4 text-red-500" />
                         </Button>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ))
+                ):(
+                   <TableRow>
+      <TableCell colSpan={6} className="text-center">
+        No Admin found
+      </TableCell>
+    </TableRow>
+                )}
                 </TableBody>
               </Table>
             </Card>

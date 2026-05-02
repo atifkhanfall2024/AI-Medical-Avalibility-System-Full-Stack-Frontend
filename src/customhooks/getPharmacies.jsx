@@ -4,10 +4,11 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
-const MyComponent = () => {
+const MyComponent = (user) => {
 
 const dispatch = useDispatch()
-  const GetAllPharmacies = async () => {
+useEffect(()=>{
+const GetAllPharmacies = async () => {
     try {
       const res = await axios.get(`${Backend_URL}/getPharmacy`, {
         withCredentials: true,
@@ -19,9 +20,12 @@ const dispatch = useDispatch()
     }
   };
 
-  useEffect(() => {
-    GetAllPharmacies();
-  }, []);
+  if(user){
+   GetAllPharmacies()
+  }
+
+} , [user])
+  
 
 };
 
