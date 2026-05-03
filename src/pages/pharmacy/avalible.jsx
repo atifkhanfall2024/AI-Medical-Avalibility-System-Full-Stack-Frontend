@@ -16,15 +16,15 @@ const AvailablePharmacies = () => {
   const available = list.filter((p) => p.isOnline);
 
   return (
-    <div className="min-h-screen bg-[#eef6f7] flex justify-center">
+    <div className="min-h-screen bg-gradient-to-r from-cyan-500 to-blue-600 flex justify-center">
       <main className="w-full max-w-6xl px-4 py-10">
 
         {/* Header */}
         <div className="mb-10 text-center">
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-3xl font-bold text-white">
             Available Pharmacies
           </h1>
-          <p className="text-gray-500 mt-2">
+          <p className="text-white mt-2">
             Browse pharmacies currently available online.
           </p>
         </div>

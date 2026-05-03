@@ -26,7 +26,14 @@ export const Header = ({ name, avatarUrl }) => {
   { name:user?.Role === "Admin" && user?.status === "Approved"?"Admin" : "Reports", path:
     user?.Role === "Admin" && user?.status === "Approved"
       ? "/admin"
-      : "/report",},
+      : "/report"  },
+
+       {
+      name:user?.Role === "Pharmacy" && user?.status === "Approved"?"User Requests" : "", path:
+    user?.Role === "Pharmacy" && user?.status === "Approved"
+      ? "/request/users"
+      : ""
+      },
 ];
 
   const initials = safeName

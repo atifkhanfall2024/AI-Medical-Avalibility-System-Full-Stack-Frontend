@@ -10,6 +10,9 @@ import {
   CheckCircle2, Building2, Clock, Sparkles, Pill,
 } from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios";
+import Backend_URL from "@/utils/constant";
+import getCoordinates from "@/utils/getLocation";
 
 const seed = [
   { id: "PH-2041", name: "GreenCare Pharmacy", location: "Lahore, Gulberg III", phone: "+92 300 1234567", isOnline: true, createdAt: "Today, 10:24 AM" },
@@ -30,9 +33,8 @@ const Pharmacy = () => {
     location.trim().length >= 2 &&
     phone.trim().length >= 7;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
+  // ✅ FIXED FUNCTION
+  const HandleForm = async () => {
     if (!valid) {
       toast.error("Please fill all fields correctly.");
       return;
@@ -40,30 +42,55 @@ const Pharmacy = () => {
 
     setSubmitting(true);
 
-    setTimeout(() => {
+    try {
+      // ✅ get coordinates ONLY when button clicked
+      //const coords = await getCoordinates(location);
+
+      //console.log("coords:", coords); // should be [lng, lat]
+
+      const res = await axios.post(
+        `${Backend_URL}/form/create`,
+        {
+          name,
+          phone,
+          isOnline,
+
+          
+          location:location
+        },
+        { withCredentials: true }
+      );
+
+      toast.success(res?.data?.message || "Pharmacy Register Success");
+
+      // ✅ UI update
       const entry = {
         id: `PH-${Math.floor(2042 + Math.random() * 900)}`,
-        name: name.trim(),
-        location: location.trim(),
-        phone: phone.trim(),
+        name,
+        location,
+        phone,
         isOnline,
         createdAt: "Just now",
       };
 
-      setList([entry, ...list]);
+      setList((prev) => [entry, ...prev]);
 
-      toast.success(`${entry.name} registered successfully ✓`);
-
+      // ✅ reset form
       setName("");
       setLocation("");
       setPhone("");
       setIsOnline(true);
+
+    } catch (error) {
+      console.log(error);
+      toast.error("Not Register Pharmacy");
+    } finally {
       setSubmitting(false);
-    }, 500);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#eef6f7] flex justify-center">
+    <div className="min-h-screen bg-gradient-to-r from-cyan-500 to-blue-600 flex justify-center">
       <main className="w-full max-w-6xl px-4 py-10">
 
         {/* Header */}
@@ -72,11 +99,11 @@ const Pharmacy = () => {
             <Pill className="size-3 mr-1" /> Pharmacy Portal
           </Badge>
 
-          <h1 className="text-4xl font-bold text-gray-800">
+          <h1 className="text-4xl font-bold text-white">
             Register Your Pharmacy
           </h1>
 
-          <p className="text-gray-500 mt-2 max-w-xl mx-auto">
+          <p className="text-white mt-2 max-w-xl mx-auto">
             Add your pharmacy details to join the AMAS Medical network.
           </p>
         </div>
@@ -96,9 +123,8 @@ const Pharmacy = () => {
             </CardHeader>
 
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form className="space-y-5">
 
-                {/* Name */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1">
                     <Building2 className="size-3.5 text-gray-400" /> Pharmacy Name
@@ -111,7 +137,6 @@ const Pharmacy = () => {
                   />
                 </div>
 
-                {/* Location */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1">
                     <MapPin className="size-3.5 text-gray-400" /> Location
@@ -124,7 +149,6 @@ const Pharmacy = () => {
                   />
                 </div>
 
-                {/* Phone */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1">
                     <Phone className="size-3.5 text-gray-400" /> Phone Number
@@ -155,7 +179,8 @@ const Pharmacy = () => {
 
                 {/* Button */}
                 <Button
-                  type="submit"
+                  type="button"
+                  onClick={HandleForm}
                   disabled={!valid || submitting}
                   className="w-full h-11 text-white text-base rounded-lg bg-gradient-to-r from-teal-400 to-cyan-500"
                 >
@@ -180,9 +205,6 @@ const Pharmacy = () => {
               <div className="flex items-center gap-2 text-xs uppercase">
                 <Sparkles className="size-3" /> Live Preview
               </div>
-              <p className="text-xs mt-1">
-                How patients will see your pharmacy
-              </p>
             </div>
 
             <CardContent className="p-5 space-y-3">
@@ -199,65 +221,6 @@ const Pharmacy = () => {
           </Card>
 
         </div>
-
-        {/* List */}
-     <div className="grid md:grid-cols-2 mt-4 lg:grid-cols-3 gap-4">
-  {list.map((p, i) => (
-    <div
-      key={p.id}
-      className="bg-white border rounded-2xl p-4 shadow-sm hover:shadow-md transition-all"
-    >
-      {/* Top */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-3">
-          {/* Avatar */}
-          <div className="w-10 h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center font-semibold">
-            {p.name
-              .split(" ")
-              .map((n) => n[0])
-              .slice(0, 2)
-              .join("")}
-          </div>
-
-          {/* Name + ID */}
-          <div>
-            <div className="font-semibold text-gray-800">
-              {p.name}
-            </div>
-            <div className="text-xs text-gray-400">
-              {p.id}
-            </div>
-          </div>
-        </div>
-
-        {/* Status Badge */}
-        <div
-          className={`text-xs px-2 py-1 rounded-full border ${
-            p.isOnline
-              ? "bg-teal-50 text-teal-600 border-teal-200"
-              : "bg-gray-100 text-gray-500 border-gray-200"
-          }`}
-        >
-          {p.isOnline ? "Online" : "Offline"}
-        </div>
-      </div>
-
-      {/* Info */}
-      <div className="text-xs text-gray-500 space-y-1">
-        <div className="flex items-center gap-1">
-          📍 {p.location}
-        </div>
-        <div className="flex items-center gap-1">
-          📞 {p.phone}
-        </div>
-        <div className="flex items-center gap-1">
-          ⏱ {p.createdAt}
-        </div>
-      </div>
-    </div>
-  ))}
-</div>
-
       </main>
     </div>
   );

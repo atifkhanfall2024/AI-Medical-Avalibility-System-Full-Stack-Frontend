@@ -14,6 +14,9 @@ import MyComponent from './customhooks/getPharmacies';
 import GetAdmins from './customhooks/getAdmins';
 import Pharmacy from './pages/pharmacy/pharmacy';
 import AvailablePharmacies from './pages/pharmacy/avalible';
+import UserRequest from './pages/users/userRequest';
+import GetUsers from './customhooks/userRequest';
+import useGetUsers from './customhooks/userRequest';
 
 
 
@@ -26,6 +29,7 @@ function App() {
   // console.log("App" ,  user);
    MyComponent(user)
    GetAdmins(user)
+   useGetUsers(user)
 
   return (
   
@@ -47,6 +51,7 @@ function App() {
        <Route  path='admin' element={<Admin/>} />
        <Route path='pharmacy/form' element={<Pharmacy/>} />
        <Route path='avalible/pharmacy' element={<AvailablePharmacies/>}/>
+       <Route path='/request/users' element={<UserRequest/>} />
        </Route>
        </Routes>
 

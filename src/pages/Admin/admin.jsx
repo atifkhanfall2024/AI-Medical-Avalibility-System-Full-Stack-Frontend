@@ -177,29 +177,16 @@ useEffect(() => {
   
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-gradient-to-r from-cyan-500 to-blue-600">
 
       {/* NAVBAR */}
-      <div className="bg-white px-6 py-4 flex justify-between items-center shadow">
-        <h1 className="font-semibold text-lg">AMAS Medical</h1>
-
-        <Input
-          placeholder="Search patients, records..."
-          className="max-w-md"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-
-        <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center text-white">
-          A
-        </div>
-      </div>
+     
 
       <div className="max-w-7xl mx-auto p-6">
 
         {/* TITLE */}
-        <h2 className="text-3xl font-bold">Pending Approvals</h2>
-        <p className="text-gray-500 mb-6">
+        <h2 className="text-3xl text-white font-bold">Pending Approvals</h2>
+        <p className="text-white mb-6">
           Review and approve new pharmacy registrations and admin requests.
         </p>
 
