@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import Backend_URL from "@/utils/constant";
 import getCoordinates from "@/utils/getLocation";
+import { useSelector } from "react-redux";
 
 const seed = [
   { id: "PH-2041", name: "GreenCare Pharmacy", location: "Lahore, Gulberg III", phone: "+92 300 1234567", isOnline: true, createdAt: "Today, 10:24 AM" },
@@ -27,6 +28,12 @@ const Pharmacy = () => {
   const [isOnline, setIsOnline] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [list, setList] = useState(seed);
+
+
+
+
+
+
 
   const valid =
     name.trim().length >= 2 &&

@@ -25,7 +25,7 @@ const [requestsList, setRequestsList] = useState([]);
   // ✅ Only Online Pharmacies
   const available = list.filter((p) => p.isOnline);
   const user =  useSelector((store)=>store?.user)
-  const request = useSelector((store)=>store?.request)
+  const request = useSelector((store)=>store?.request || [])
   useGetUsers(user)
 
   useEffect(() => {

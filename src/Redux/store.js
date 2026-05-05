@@ -3,13 +3,14 @@ import UserSlice from './userslice'
 import PharmacySlice from './pharmacy'
 import AdminSlice from './Admin'
 import RequestSlice from './userRequestslice'
-
+import AvalibleSlice from './AvaliblePharmacy'
 const Store = configureStore({
     reducer:{
       user:UserSlice,
       pharmacy:PharmacySlice,
       admin:AdminSlice ,
-      request:RequestSlice
+      request:RequestSlice,
+      apharma:AvalibleSlice
     }
 })
 

@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import Backend_URL from "@/utils/constant";
+import { useDispatch } from "react-redux";
+import { addNearPharmacy } from "@/Redux/AvaliblePharmacy";
 
 const popularMeds = [
   "Paracetamol",
@@ -29,6 +31,7 @@ const SearchTablet = () => {
   const [loading, setLoading] = useState(false);
   const [locating, setLocating] = useState(false);
   const [coords, setCoords] = useState(null);
+  const dispatch = useDispatch()
 
 
  const HandleRequest = async (e) => {
@@ -51,8 +54,9 @@ const SearchTablet = () => {
       },
       { withCredentials: true }
     );
-
+  dispatch(addNearPharmacy(res?.data?.pharma))
     toast.success("Request sent successfully");
+    navigate('/avalible/pharmacy')
     setCoords('')
     setLocation('')
     setTablet('')

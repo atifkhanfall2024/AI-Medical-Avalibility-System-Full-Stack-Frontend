@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Clock, Store } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const seed = [
   { id: "PH-2041", name: "GreenCare Pharmacy", location: "Lahore, Gulberg III", phone: "+92 300 1234567", isOnline: true, createdAt: "Today, 10:24 AM" },
@@ -11,6 +12,49 @@ const seed = [
 
 const AvailablePharmacies = () => {
   const [list] = useState(seed);
+    const [addresses, setAddresses] = useState({});
+  const AvaliblePharmacy = useSelector((store)=>store?.apharma || [])
+  console.log(AvaliblePharmacy);
+
+
+    useEffect(() => {
+    const fetchAddresses = async () => {
+      const newAddresses = {};
+  
+      for (let p of AvaliblePharmacy) {
+        if (p?.location?.coordinates) {
+          const [lng, lat] = p.location.coordinates;
+  
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+          );
+          const data = await res.json();
+  
+          const area =
+            data.address?.suburb ||
+            data.address?.neighbourhood ||
+            data.address?.village ||
+            "";
+  
+          const city =
+            data.address?.city ||
+            data.address?.town ||
+            data.address?.county ||
+            "";
+  
+          const country = data.address?.country || "";
+  
+          newAddresses[p._id] = `${area}, ${city}, ${country}`;
+        }
+      }
+  
+      setAddresses(newAddresses);
+    };
+  
+    if (AvaliblePharmacy.length > 0) {
+      fetchAddresses();
+    }
+  }, [AvaliblePharmacy]);
 
   // ✅ Only Online Pharmacies
   const available = list.filter((p) => p.isOnline);
@@ -42,7 +86,7 @@ const AvailablePharmacies = () => {
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-              {available.map((p) => (
+              {AvaliblePharmacy.length > 0  ? (AvaliblePharmacy.map((p) => (
                 <div
                   key={p.id}
                   className="bg-white border rounded-2xl p-4 shadow-sm hover:shadow-md transition-all"
@@ -52,7 +96,7 @@ const AvailablePharmacies = () => {
                     <div className="flex items-center gap-3">
                       {/* Avatar */}
                       <div className="w-10 h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center font-semibold">
-                        {p.name
+                        {p?.name
                           .split(" ")
                           .map((n) => n[0])
                           .slice(0, 2)
@@ -62,41 +106,39 @@ const AvailablePharmacies = () => {
                       {/* Name + ID */}
                       <div>
                         <div className="font-semibold text-gray-800">
-                          {p.name}
+                          {p?.name}
                         </div>
                         <div className="text-xs text-gray-400">
-                          {p.id}
+                          {p?._id}
                         </div>
                       </div>
                     </div>
 
                     {/* Status */}
                     <div className="text-xs px-2 py-1 rounded-full border bg-teal-50 text-teal-600 border-teal-200">
-                      Online
+                      {p?.isOnline ===true ? "Online" : "Offline"}
                     </div>
                   </div>
 
                   {/* Info */}
                   <div className="text-xs text-gray-500 space-y-1">
                     <div className="flex items-center gap-1">
-                      <MapPin className="size-3" /> {p.location}
+                      <MapPin className="size-3" /> {addresses[p?._id]|| "Loading......."}
                     </div>
                     <div className="flex items-center gap-1">
-                      <Phone className="size-3" /> {p.phone}
+                      <Phone className="size-3" /> {p?.phone}
                     </div>
                     <div className="flex items-center gap-1">
                       <Clock className="size-3" /> {p.createdAt}
                     </div>
                   </div>
                 </div>
-              ))}
-
-              {/* Empty State */}
-              {available.length === 0 && (
+              ))):(
                 <div className="col-span-full text-center text-gray-500 py-10">
-                  No pharmacies available right now.
+                      On the basis of your request pharmacies will be shown
                 </div>
               )}
+
 
             </div>
           </CardContent>
