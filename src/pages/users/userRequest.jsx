@@ -5,6 +5,9 @@ import { MapPin, Phone, Clock, Store } from "lucide-react";
 import { useSelector } from "react-redux";
 import GetUsers from "@/customhooks/userRequest";
 import useGetUsers from "@/customhooks/userRequest";
+import axios from "axios";
+import Backend_URL from "@/utils/constant";
+import { toast } from "sonner";
 
 const seed = [
   { id: "PH-2041", name: "GreenCare Pharmacy", location: "Lahore, Gulberg III", phone: "+92 300 1234567", isOnline: true, createdAt: "Today, 10:24 AM" },
@@ -15,6 +18,9 @@ const seed = [
 const UserRequest = () => {
   const [list] = useState(seed);
   const [addresses, setAddresses] = useState({});
+  
+const [requestsList, setRequestsList] = useState([]);
+
 
   // ✅ Only Online Pharmacies
   const available = list.filter((p) => p.isOnline);
@@ -22,6 +28,23 @@ const UserRequest = () => {
   const request = useSelector((store)=>store?.request)
   useGetUsers(user)
 
+  useEffect(() => {
+  if (request?.length > 0) {
+    setRequestsList(request);
+  }
+}, [request]);
+
+  const HandleUserRequest = async(id , status)=>{
+      try {
+        
+        const res = await axios.post(`${Backend_URL}/ChangeStatus/${id}/${status}` , {} , {withCredentials:true})
+        setRequestsList((prev) => prev.filter((item) => item._id !== id));
+       toast.success(`Request ${status} Success`)
+      } catch (error) {
+        console.log(error);
+        toast.error(`Request ${status} failed`)
+      }
+  }
 
   useEffect(() => {
   const fetchAddresses = async () => {
@@ -91,8 +114,8 @@ const UserRequest = () => {
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-            {request.length > 0 ? (
-  request.map((p) => (
+            {requestsList.length > 0 ? (
+  requestsList.map((p) => (
     <div
       key={p._id}
       className="bg-white border rounded-2xl p-5 shadow-sm hover:shadow-md transition-all"
@@ -162,10 +185,16 @@ const UserRequest = () => {
 
       {/* Action Buttons (Optional but 🔥) */}
       <div className="mt-5 flex gap-2">
-        <button className="flex-1 text-xs bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-green-600 text-white py-2 rounded-lg transition">
+        <button className="flex-1 text-xs bg-gradient-to-r from-cyan-500 to-blue-600 
+        hover:bg-green-600 text-white py-2 rounded-lg transition" 
+    
+        onClick={()=>HandleUserRequest(p?._id , "completed")}>
           Accept
         </button>
-        <button className="flex-1 text-xs bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg transition">
+        <button className="flex-1 text-xs bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg transition"
+   
+        onClick={()=>HandleUserRequest(p?._id , "rejected")}
+        >
           Reject
         </button>
       </div>
