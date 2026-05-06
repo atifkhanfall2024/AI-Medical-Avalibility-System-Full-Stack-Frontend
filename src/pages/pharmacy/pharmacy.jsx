@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import axios from "axios";
 import Backend_URL from "@/utils/constant";
 import getCoordinates from "@/utils/getLocation";
 import { useSelector } from "react-redux";
+import GetPharmacy from '../../customhooks/getpharmacy'
 
 const seed = [
   { id: "PH-2041", name: "GreenCare Pharmacy", location: "Lahore, Gulberg III", phone: "+92 300 1234567", isOnline: true, createdAt: "Today, 10:24 AM" },
@@ -28,12 +29,22 @@ const Pharmacy = () => {
   const [isOnline, setIsOnline] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [list, setList] = useState(seed);
+  const [onlineStatus, setOnlineStatus] = useState(false);
 
 
+ 
 
 
+  const user = useSelector((store)=>store?.user)
+  GetPharmacy(user)
 
-
+  const getpharma = useSelector((store)=>store?.getpharma || [])
+  console.log('getpharma ' , getpharma);
+   useEffect(() => {
+  if (getpharma?._id) {
+    setOnlineStatus(getpharma.isOnline);
+  }
+}, [getpharma]);
 
   const valid =
     name.trim().length >= 2 &&
@@ -95,6 +106,26 @@ const Pharmacy = () => {
       setSubmitting(false);
     }
   };
+
+const handleToggle = async (id, value) => {
+  try {
+    const res = await axios.post(
+      `${Backend_URL}/online-offline`,
+      { id, IsActive: value },
+      { withCredentials: true }
+    );
+
+  toast.success(
+  res?.data?.message || `Now ${onlineStatus ? "Online 🟢" : "Offline 🔴"}`
+);
+
+
+
+  } catch (error) {
+    console.log(error?.response?.data || error);
+    toast.error(error?.response?.data?.message);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-cyan-500 to-blue-600 flex justify-center">
@@ -214,17 +245,55 @@ const Pharmacy = () => {
               </div>
             </div>
 
-            <CardContent className="p-5 space-y-3">
-              <div className="font-semibold">
-                {name || "Your Pharmacy Name"}
-              </div>
-              <div className="text-sm text-gray-500">
-                {location || "Location not set"}
-              </div>
-              <div className="text-sm text-gray-500">
-                {phone || "Phone not set"}
-              </div>
-            </CardContent>
+           
+ 
+    <CardContent  className="p-5 space-y-3">
+
+      <div className="font-semibold">
+        {getpharma?.name || "Your Pharmacy Name"}
+      </div>
+
+      <div className="text-sm text-gray-500">
+        {getpharma?.location?.coordinates || "Location not set"}
+      </div>
+
+      <div className="text-sm text-gray-500">
+        {getpharma?.phone || "Phone not set"}
+      </div>
+
+      {/* Toggle */}
+      <div className="flex items-center justify-between rounded-xl border bg-gray-50 p-4">
+        <div className="flex items-center gap-3">
+      <div className={`size-10 rounded-lg grid place-items-center ${
+  onlineStatus ? "bg-teal-100 text-teal-600" : "bg-red-200"
+}`}>
+  {onlineStatus ? <Wifi /> : <WifiOff />}
+</div>
+          <div>
+            <Label>Online Availability</Label>
+            <p className="text-xs text-gray-500">
+              Accepting online orders
+            </p>
+          </div>
+        </div>
+
+       <Switch
+   checked={onlineStatus}
+  onCheckedChange={setOnlineStatus}
+  
+/>
+      </div>
+
+      <Button
+  type="button"
+  onClick={() => handleToggle(getpharma?._id, onlineStatus)}
+  className="w-full h-11 text-white text-base rounded-lg bg-gradient-to-r from-teal-400 to-cyan-500"
+>
+  Update Pharmacy Status
+</Button>
+
+    </CardContent>
+
           </Card>
 
         </div>

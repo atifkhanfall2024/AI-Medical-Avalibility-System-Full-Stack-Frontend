@@ -136,6 +136,7 @@ const AvailablePharmacies = () => {
               ))):(
                 <div className="col-span-full text-center text-gray-500 py-10">
                       On the basis of your request pharmacies will be shown
+                     <h4 className="text-red-400">Only Online Pharmacies Shown Near To You</h4> 
                 </div>
               )}
 
