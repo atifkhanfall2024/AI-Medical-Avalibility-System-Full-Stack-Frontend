@@ -42,7 +42,9 @@ const Index = () => {
   const [locating, setLocating] = useState(false);
   const [location, setLocation] = useState("");
   const [coords, setCoords] = useState(null);
+  const [image, setImage] = useState(null);
   const navigate = useNavigate()
+  const [license, setLicense] = useState(null);
 
 
   const handleUseMyLocation = () => {
@@ -71,18 +73,33 @@ const Index = () => {
   );
 };
 
+const handleImage = (e) => {
+  setImage(e.target.files[0]);
+};
+
+
 
   const handleSubmit = async(e) => {
     e.preventDefault();
+
+    if (role === "Pharmacy" && !license) {
+  toast.error("Pharmacy license is required");
+  return;
+}
+
+const formData = new FormData()
+formData.append("Photo" , image)
+formData.append("Email", email);
+formData.append("Password", password);
+formData.append("FullName", name);
+formData.append("Role", role);
+formData.append("PhoneNumber", phone);
+formData.append("location", JSON.stringify(coords));
+formData.append("License", license);
+
   try {
-      const response = await axios.post(`${Backend_URL}/signup` , {
-      Email:email ,
-      Password:password ,
-      FullName:name ,
-      Role:role , 
-      PhoneNumber:phone,
-      location:coords
-    } , {withCredentials:true})
+      const response = await axios.post(`${Backend_URL}/signup` ,
+   formData, {withCredentials:true})
 
     console.log(response.data);
     toast.success(` ${response?.data}   Welcome ${name || "to MediCare"}! Signed up as ${role}.`);
@@ -228,6 +245,104 @@ const Index = () => {
                   </div>
                 </div>
             {/* Roles */}
+      <div className="space-y-2">
+  <Label className="text-gray-700">Profile Photo</Label>
+
+  <div className="flex items-center gap-4">
+    
+    {/* Preview Box */}
+    <div className="relative">
+      {image ? (
+        <img
+          src={URL.createObjectURL(image)}
+          alt="preview"
+          className="h-20 w-20 rounded-2xl object-cover border shadow-md"
+        />
+      ) : (
+        <div className="h-20 w-20 rounded-2xl bg-gray-100 border flex items-center justify-center text-gray-400">
+          <User className="size-6" />
+        </div>
+      )}
+    </div>
+
+    {/* Upload Button */}
+    <label className="cursor-pointer">
+      <div className="px-4 py-2 rounded-xl bg-blue-500 text-white text-sm hover:bg-blue-600 transition">
+        Upload Image
+      </div>
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImage}
+        className="hidden"
+      />
+    </label>
+
+    {/* Remove Button */}
+    {image && (
+      <button
+        type="button"
+        onClick={() => setImage(null)}
+        className="text-sm text-red-500 hover:underline"
+      >
+        Remove
+      </button>
+    )}
+  </div>
+</div>
+
+{role === "Pharmacy" && (
+  <div className="space-y-2">
+    <Label className="text-gray-700">
+      Pharmacy License (Required)
+    </Label>
+
+    <div className="flex items-center gap-4">
+      
+      {/* Preview box */}
+      <div className="relative">
+        {license ? (
+          <img
+            src={URL.createObjectURL(license)}
+            alt="license preview"
+            className="h-20 w-20 rounded-2xl object-cover border shadow-md"
+          />
+        ) : (
+          <div className="h-20 w-20 rounded-2xl bg-gray-100 border flex items-center justify-center text-gray-400 text-xs text-center">
+            No License
+          </div>
+        )}
+      </div>
+
+      {/* Upload button */}
+      <label className="cursor-pointer">
+        <div className="px-4 py-2 rounded-xl bg-red-500 text-white text-sm hover:bg-red-600 transition">
+          Upload License
+        </div>
+
+        <input
+          type="file"
+          accept="image/*,.pdf"
+          onChange={(e) => setLicense(e.target.files[0])}
+          className="hidden"
+        />
+      </label>
+
+      {/* Remove */}
+      {license && (
+        <button
+          type="button"
+          onClick={() => setLicense(null)}
+          className="text-sm text-red-500 hover:underline"
+        >
+          Remove
+        </button>
+      )}
+    </div>
+  </div>
+)}
+
             <div className="space-y-2">
               <Label className="text-gray-700">Role</Label>
               <div className="grid grid-cols-3 gap-2">

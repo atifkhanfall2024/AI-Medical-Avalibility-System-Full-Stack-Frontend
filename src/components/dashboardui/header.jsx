@@ -111,12 +111,15 @@ export const Header = ({ name, avatarUrl }) => {
           </Button>
 
           {/* AVATAR */}
-          <Avatar className="size-9">
-            {avatarUrl && <AvatarImage src={avatarUrl} alt={safeName} />}
-            <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+         <Avatar className="size-9">
+  {avatarUrl || user?.Photo ? (
+    <AvatarImage src={avatarUrl || user?.Photo} alt={safeName} />
+  ) : null}
+
+  <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm">
+    {safeName?.slice(0, 2)?.toUpperCase()}
+  </AvatarFallback>
+</Avatar>
 
           {/* SIGN OUT */}
           <Button

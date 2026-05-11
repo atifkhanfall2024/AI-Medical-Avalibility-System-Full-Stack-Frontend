@@ -17,6 +17,7 @@ import AvailablePharmacies from './pages/pharmacy/avalible';
 import UserRequest from './pages/users/userRequest';
 import GetUsers from './customhooks/userRequest';
 import useGetUsers from './customhooks/userRequest';
+import Chat from './pages/chat';
 
 
 
@@ -52,6 +53,7 @@ function App() {
        <Route path='pharmacy/form' element={<Pharmacy/>} />
        <Route path='avalible/pharmacy' element={<AvailablePharmacies/>}/>
        <Route path='/request/users' element={<UserRequest/>} />
+       <Route path='/chat/:id'  element={<Chat/>} />
        </Route>
        </Routes>
 

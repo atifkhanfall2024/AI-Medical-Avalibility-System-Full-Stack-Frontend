@@ -259,7 +259,7 @@ useEffect(() => {
         </TableCell>
 
         <TableCell>
-          <LicensePreview src={p.Photo} />
+          <LicensePreview src={p.License} />
         </TableCell>
 
         <TableCell>
