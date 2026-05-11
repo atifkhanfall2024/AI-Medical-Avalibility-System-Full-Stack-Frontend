@@ -8,6 +8,9 @@ import useGetUsers from "@/customhooks/userRequest";
 import axios from "axios";
 import Backend_URL from "@/utils/constant";
 import { toast } from "sonner";
+import { MessageCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 
 const seed = [
   { id: "PH-2041", name: "GreenCare Pharmacy", location: "Lahore, Gulberg III", phone: "+92 300 1234567", isOnline: true, createdAt: "Today, 10:24 AM" },
@@ -20,7 +23,7 @@ const UserRequest = () => {
   const [addresses, setAddresses] = useState({});
   
 const [requestsList, setRequestsList] = useState([]);
-
+const navigate = useNavigate()
 
   // ✅ Only Online Pharmacies
   const available = list.filter((p) => p.isOnline);
@@ -184,20 +187,36 @@ const [requestsList, setRequestsList] = useState([]);
       </div>
 
       {/* Action Buttons (Optional but 🔥) */}
-      <div className="mt-5 flex gap-2">
-        <button className="flex-1 text-xs bg-gradient-to-r from-cyan-500 to-blue-600 
-        hover:bg-green-600 text-white py-2 rounded-lg transition" 
-    
-        onClick={()=>HandleUserRequest(p?._id , "completed")}>
-          Accept
-        </button>
-        <button className="flex-1 text-xs bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg transition"
-   
-        onClick={()=>HandleUserRequest(p?._id , "rejected")}
-        >
-          Reject
-        </button>
-      </div>
+     {/* Action Buttons */}
+<div className="mt-5 flex gap-2">
+
+  {/* Accept */}
+  <button
+    className="flex-1 text-xs bg-gradient-to-r from-cyan-500 to-blue-600 
+    hover:opacity-90 text-white py-2 rounded-lg transition font-medium"
+    onClick={() => HandleUserRequest(p?._id, "completed")}
+  >
+    Accept
+  </button>
+
+  {/* Reject */}
+  <button
+    className="flex-1 text-xs bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg transition font-medium"
+    onClick={() => HandleUserRequest(p?._id, "rejected")}
+  >
+    Reject
+  </button>
+
+  {/* Chat Button */}
+  <button
+    className="flex items-center justify-center gap-2 px-4 bg-teal-500 hover:bg-teal-600 text-white rounded-lg transition"
+    onClick={() => navigate(`/chat/${p?.userId?._id}`)}
+  >
+    <MessageCircle className="size-4" />
+    Chat
+  </button>
+
+</div>
     </div>
   ))
 ) : (

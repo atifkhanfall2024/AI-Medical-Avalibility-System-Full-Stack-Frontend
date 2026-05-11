@@ -166,7 +166,7 @@ const AvailablePharmacies = () => {
                     </div>
 
                     {/* Chat Button */}
-                    <Link to={'/chat/'+p?._id}><button
+                    <Link to={'/chat/'+p?.userId}><button
                       className="mt-4 w-full flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-xl transition-all"
                     >
                       <MessageCircle className="size-4" />
