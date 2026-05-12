@@ -24,6 +24,7 @@ const Chat = () => {
 
   const userid = user?._id;
   const name = user?.FullName;
+  const image = user?.Photo
 
   // SOCKET CONNECTION
   useEffect(() => {
@@ -135,7 +136,7 @@ const Chat = () => {
               <div className="relative">
 
                 <div className="w-12 h-12 rounded-full bg-cyan-500 text-white flex items-center justify-center font-bold text-lg">
-                  {name?.charAt(0)?.toUpperCase()}
+                  <img className="w-12 h-12 rounded-full bg-cyan-500 text-white flex items-center justify-center font-bold text-lg" src= {image || name?.charAt(0)?.toUpperCase()} alt="image"/>
                 </div>
 
                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
