@@ -23,10 +23,10 @@ export const Header = ({ name, avatarUrl }) => {
     user?.Role === "Pharmacy" && user?.status === "Approved"
       ? "/pharmacy/form"
       : "avalible/pharmacy" },
-  { name:user?.Role === "Admin" && user?.status === "Approved"?"Admin" : "Reports", path:
+  { name:user?.Role === "Admin" && user?.status === "Approved"?"Admin" : "Subscription", path:
     user?.Role === "Admin" && user?.status === "Approved"
       ? "/admin"
-      : "/report"  },
+      : "/payment"  },
 
        {
       name:user?.Role === "Pharmacy" && user?.status === "Approved"?"User Requests" : "", path:

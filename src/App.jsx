@@ -18,6 +18,7 @@ import UserRequest from './pages/users/userRequest';
 import GetUsers from './customhooks/userRequest';
 import useGetUsers from './customhooks/userRequest';
 import Chat from './pages/chat';
+import Payment from './pages/payment/payment';
 
 
 
@@ -54,6 +55,7 @@ function App() {
        <Route path='avalible/pharmacy' element={<AvailablePharmacies/>}/>
        <Route path='/request/users' element={<UserRequest/>} />
        <Route path='/chat/:id'  element={<Chat/>} />
+       <Route path='/payment' element={<Payment/>}/>
        </Route>
        </Routes>
 

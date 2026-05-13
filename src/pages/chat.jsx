@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Send,
   Phone,
@@ -11,48 +11,188 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { SocketClient } from "@/utils/socketClient";
 import { useSelector } from "react-redux";
+import axios from "axios";
+import Backend_URL from "@/utils/constant";
+import { toast } from "sonner";
 
 const Chat = () => {
+
   const { id } = useParams();
 
-  const [sendMessages, setsendMessages] = useState("");
-  const [messages, setmessages] = useState([]);
+  const [sendMessages, setsendMessages] =
+    useState("");
+
+  const [messages, setmessages] =
+    useState([]);
 
   const socketRef = useRef(null);
+  const navigate = useNavigate()
 
-  const user = useSelector((store) => store?.user);
+  const user = useSelector(
+    (store) => store?.user
+  );
 
   const userid = user?._id;
   const name = user?.FullName;
-  const image = user?.Photo
+  const image = user?.Photo;
 
-  // SOCKET CONNECTION
+  // =========================================
+  // NORMALIZE MESSAGE
+  // =========================================
+  const normalizeMessage = (msg) => {
+    return {
+      ...msg,
+
+      userid:
+        msg?.userid ||
+        msg?.senderId ||
+        msg?.sender?._id,
+
+      text: msg?.text || "",
+
+      name:
+        msg?.name ||
+        msg?.sender?.FullName ||
+        "User",
+
+      time:
+        msg?.time ||
+        new Date(
+          msg?.createdAt || Date.now()
+        ).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+    };
+  };
+
+  // =========================================
+  // GET CHATS
+  // =========================================
+  const GetChats = async () => {
+
+    try {
+
+      const res = await axios.get(
+        `${Backend_URL}/getchats/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      const dbMessages =
+        res?.data?.chat?.messages || [];
+
+      const formattedMessages =
+        dbMessages.map((msg) =>
+          normalizeMessage(msg)
+        );
+
+      setmessages(formattedMessages);
+
+    } catch (error) {
+
+      console.log(
+        error?.message || error
+      );
+    }
+  };
+
+  // =========================================
+  // LOAD CHATS
+  // =========================================
   useEffect(() => {
+
+    if (id) {
+      GetChats();
+    }
+
+  }, [id]);
+
+
+
+
+
+
+  // =========================================
+  // SOCKET CONNECTION
+  // =========================================
+  useEffect(() => {
+
     if (!user) return;
 
     socketRef.current = SocketClient();
 
-    // JOIN CHAT
-    socketRef.current.emit("JoinChat", {
-      name,
-      userid,
-      id,
-    });
+    // JOIN ROOM
+    socketRef.current.emit(
+      "JoinChat",
+      {
+        name,
+        userid,
+        id,
+      }
+    );
 
+ socketRef.current.on("MessageLimitReached", (data) => {
+    console.log("MessageLimitReached received:", data);
+    toast.error(data.message);
+    navigate("/payment");
+  });
     // RECEIVE MESSAGE
     const handleMessage = (data) => {
-      setmessages((prev) => [...prev, data]);
+
+      const formattedMessage =
+        normalizeMessage(data);
+
+      setmessages((prev) => {
+
+        // PREVENT DUPLICATE MESSAGE
+        const alreadyExists =
+          prev.some(
+            (msg) =>
+              msg?.text ===
+                formattedMessage?.text &&
+              msg?.time ===
+                formattedMessage?.time &&
+              msg?.userid ===
+                formattedMessage?.userid
+          );
+
+        if (alreadyExists) {
+          return prev;
+        }
+
+        return [
+          ...prev,
+          formattedMessage,
+        ];
+      });
     };
 
-    socketRef.current.on("RecievedMessage", handleMessage);
+    socketRef.current.on(
+      "RecievedMessage",
+      handleMessage
+    );
 
     return () => {
-      socketRef.current.off("RecievedMessage", handleMessage);
-    };
-  }, [user, id]);
+      socketRef.current.off(
+        "MessageLimitReached"
+      )
+      socketRef.current.off(
+        "RecievedMessage",
+        handleMessage
+      );
 
+      socketRef.current.disconnect();
+    };
+
+  }, [user, id , navigate]);
+
+  // =========================================
   // SEND MESSAGE
+  // =========================================
   const SendMessgaes = (e) => {
+
     e.preventDefault();
 
     if (!sendMessages.trim()) return;
@@ -62,14 +202,23 @@ const Chat = () => {
       userid,
       id,
       text: sendMessages,
-      time: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+
+      time: new Date().toLocaleTimeString(
+        [],
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+        }
+      ),
     };
 
-    socketRef.current.emit("SendMessages", messageData);
+    // SEND TO SOCKET
+    socketRef.current.emit(
+      "SendMessages",
+      messageData
+    );
 
+    // CLEAR INPUT
     setsendMessages("");
   };
 
@@ -82,6 +231,7 @@ const Chat = () => {
         <div className="hidden md:flex w-[320px] border-r bg-gray-50 flex-col">
 
           <div className="p-5 border-b bg-white">
+
             <h2 className="text-2xl font-bold text-gray-800">
               Chats
             </h2>
@@ -89,6 +239,7 @@ const Chat = () => {
             <p className="text-sm text-gray-500 mt-1">
               Connected Users
             </p>
+
           </div>
 
           <div className="flex-1 overflow-y-auto p-3">
@@ -98,7 +249,9 @@ const Chat = () => {
               <div className="flex items-center gap-3">
 
                 <div className="w-12 h-12 rounded-full bg-cyan-500 text-white flex items-center justify-center font-bold">
+
                   {name?.charAt(0)?.toUpperCase()}
+
                 </div>
 
                 <div className="flex-1">
@@ -135,15 +288,18 @@ const Chat = () => {
 
               <div className="relative">
 
-                <div className="w-12 h-12 rounded-full bg-cyan-500 text-white flex items-center justify-center font-bold text-lg">
-                  <img className="w-12 h-12 rounded-full bg-cyan-500 text-white flex items-center justify-center font-bold text-lg" src= {image || name?.charAt(0)?.toUpperCase()} alt="image"/>
-                </div>
+                <img
+                  className="w-12 h-12 rounded-full object-cover"
+                  src={image}
+                  alt="user"
+                />
 
                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
 
               </div>
 
               <div>
+
                 <h2 className="font-semibold text-gray-800 text-lg">
                   Chat Room
                 </h2>
@@ -151,8 +307,8 @@ const Chat = () => {
                 <p className="text-sm text-green-500">
                   Online
                 </p>
-              </div>
 
+              </div>
             </div>
 
             {/* ACTIONS */}
@@ -177,14 +333,15 @@ const Chat = () => {
           <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50 to-white space-y-4">
 
             {messages.length > 0 ? (
+
               messages.map((msg, index) => {
 
-                // FIXED ALIGNMENT CHECK
                 const isMe =
-                  String(msg?.userid).trim() ===
-                  String(userid).trim();
+                  msg?.userid?.toString() ===
+                  userid?.toString();
 
                 return (
+
                   <div
                     key={index}
                     className={`w-full flex ${
@@ -202,7 +359,6 @@ const Chat = () => {
                       }`}
                     >
 
-                      {/* NAME */}
                       <div
                         className={`text-xs font-semibold mb-1 ${
                           isMe
@@ -213,12 +369,10 @@ const Chat = () => {
                         {msg?.name}
                       </div>
 
-                      {/* MESSAGE */}
                       <p className="text-sm break-words">
                         {msg?.text}
                       </p>
 
-                      {/* TIME */}
                       <div
                         className={`text-[11px] mt-2 text-right ${
                           isMe
@@ -233,12 +387,14 @@ const Chat = () => {
                   </div>
                 );
               })
-            ) : (
-              <div className="h-full flex items-center justify-center text-gray-400 text-sm">
-                No messages yet. Start conversation
-              </div>
-            )}
 
+            ) : (
+
+              <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+                No messages yet
+              </div>
+
+            )}
           </div>
 
           {/* INPUT */}
@@ -281,7 +437,6 @@ const Chat = () => {
               </button>
 
             </div>
-
           </form>
         </div>
       </div>

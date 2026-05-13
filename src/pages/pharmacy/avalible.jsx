@@ -39,7 +39,7 @@ const AvailablePharmacies = () => {
     (store) => store?.apharma || []
   );
 
-  console.log(AvaliblePharmacy);
+  //console.log(AvaliblePharmacy);
 
   useEffect(() => {
     const fetchAddresses = async () => {
