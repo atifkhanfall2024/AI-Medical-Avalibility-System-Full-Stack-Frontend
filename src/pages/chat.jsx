@@ -301,7 +301,7 @@ const Chat = () => {
               <div>
 
                 <h2 className="font-semibold text-gray-800 text-lg">
-                  Chat Room
+                 {name || 'Chat Room'}
                 </h2>
 
                 <p className="text-sm text-green-500">

@@ -19,6 +19,8 @@ import GetUsers from './customhooks/userRequest';
 import useGetUsers from './customhooks/userRequest';
 import Chat from './pages/chat';
 import Payment from './pages/payment/payment';
+import PaymentSuccess from './pages/payment/PaymentSuccess';
+import PaymentCancel from './pages/payment/CancelPayment';
 
 
 
@@ -45,7 +47,8 @@ function App() {
        <Route path='/signup' element={user? <Navigate to={'/'} /> :   <Signup/> }     />
        <Route path='/login' element={user? <Navigate to={'/'} /> : <Login/>} />
        <Route path='/verify-otp' element={user? <Navigate to={'/'} /> : <VerifyOtp/>} />
-      
+             <Route path="/payment-success" element={<PaymentSuccess />} />
+<Route path="/payment-cancel" element={<PaymentCancel />} />
        <Route path='/' element={user?<DashBoard/>: <Navigate to={'/login'} />}>
        <Route index element={<Navigate to="feed" />} />
        <Route path="feed" element={<Feed />} />
@@ -56,6 +59,7 @@ function App() {
        <Route path='/request/users' element={<UserRequest/>} />
        <Route path='/chat/:id'  element={<Chat/>} />
        <Route path='/payment' element={<Payment/>}/>
+
        </Route>
        </Routes>
 
